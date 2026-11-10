@@ -50,6 +50,14 @@ export const ViewerPage: React.FC = () => {
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Ensure body has viewer-mode class when on the viewer page
+  useEffect(() => {
+    document.body.classList.add('viewer-mode');
+    return () => {
+      document.body.classList.remove('viewer-mode');
+    };
+  }, []);
+
   // Pre-warm the PDF engine immediately on mount so it is ready before the PDF stream arrives
   useEffect(() => {
     getPdfJsLibrary().catch(() => {});
@@ -209,8 +217,8 @@ export const ViewerPage: React.FC = () => {
 
         const containerWidth = container.clientWidth || window.innerWidth;
         const isMobile = window.innerWidth <= 768;
-        const padding = isMobile ? 24 : 96;
-        const maxCanvasWidth = isMobile ? containerWidth - 24 : Math.min(containerWidth - padding, 920);
+        const padding = isMobile ? 0 : 96;
+        const maxCanvasWidth = isMobile ? containerWidth : Math.min(containerWidth - padding, 920);
 
         // Fetch Page 1 first to determine dimensions and render ASAP!
         const page1 = await pdf.getPage(1);
@@ -223,7 +231,7 @@ export const ViewerPage: React.FC = () => {
         // Cap DPR to 2 for optimal balance of razor-sharp text and fast rendering
         const outputScale = Math.min(window.devicePixelRatio || 1, 2);
 
-        const pageStyleWidth = isMobile ? 'calc(100% - 24px)' : `${Math.floor(viewport.width)}px`;
+        const pageStyleWidth = isMobile ? '100%' : `${Math.floor(viewport.width)}px`;
         const pageStyleHeight = isMobile ? 'auto' : `${Math.floor(viewport.height)}px`;
         const estimatedHeightPx = Math.floor(viewport.height);
 
@@ -243,8 +251,8 @@ export const ViewerPage: React.FC = () => {
             canvas.height = Math.floor(pViewport.height * outputScale);
             canvas.style.width = pageStyleWidth;
             canvas.style.height = pageStyleHeight;
-            canvas.style.maxWidth = isMobile ? 'calc(100% - 24px)' : '920px';
-            canvas.style.margin = '0 auto';
+            canvas.style.maxWidth = isMobile ? '100%' : '920px';
+            canvas.style.margin = isMobile ? '0 0 12px 0' : '0 auto';
 
             const ctx = canvas.getContext('2d');
             if (ctx) {
@@ -275,11 +283,12 @@ export const ViewerPage: React.FC = () => {
           slot.style.justifyContent = 'center';
           slot.style.alignItems = 'center';
           slot.style.minHeight = `${estimatedHeightPx}px`;
-          slot.style.margin = '0 auto 16px auto';
+          slot.style.margin = isMobile ? '0 0 12px 0' : '0 auto 16px auto';
+          slot.style.padding = '0';
 
           if (i > 1) {
             slot.innerHTML = `
-              <div class="pdf-page-skeleton" style="width: ${pageStyleWidth}; height: ${pageStyleHeight}; min-height: ${estimatedHeightPx}px;">
+              <div class="pdf-page-skeleton" style="width: ${pageStyleWidth}; height: ${pageStyleHeight}; min-height: ${estimatedHeightPx}px; border-radius: ${isMobile ? '0' : '8px'};">
                 <span>Page ${i} of ${pdf.numPages}</span>
               </div>
             `;
@@ -428,6 +437,19 @@ export const ViewerPage: React.FC = () => {
     ? new Date(material.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
     : 'Recently';
 
+  // Helper to provide a clean, short metadata label on mobile screens
+  const getShortMeta = (course?: string, branch?: string, subject?: string) => {
+    let branchText = branch || subject || '';
+    const abbrMatch = branchText.match(/\(([^)]+)\)/);
+    if (abbrMatch && abbrMatch[1]) {
+      branchText = abbrMatch[1].trim();
+    } else if (branchText.length > 16) {
+      branchText = branchText.slice(0, 14).trim() + '...';
+    }
+    const courseText = course ? `${course} • ` : '';
+    return `${courseText}${branchText}`;
+  };
+
   return (
     <div className="viewer-page">
       {/* Sticky Top Bar */}
@@ -440,9 +462,17 @@ export const ViewerPage: React.FC = () => {
             <h1 className="v-doc-title" title={material.title}>
               {material.title}
             </h1>
-            <span className="v-doc-meta">
-              {material.course ? `${material.course} • ` : ''}
-              {material.branch || material.subject}
+            <span
+              className="v-doc-meta"
+              title={material.course ? `${material.course} • ${material.branch || material.subject}` : material.branch || material.subject}
+            >
+              <span className="v-doc-meta-desktop">
+                {material.course ? `${material.course} • ` : ''}
+                {material.branch || material.subject}
+              </span>
+              <span className="v-doc-meta-mobile">
+                {getShortMeta(material.course, material.branch, material.subject)}
+              </span>
             </span>
           </div>
         </div>
