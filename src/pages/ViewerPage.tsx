@@ -252,7 +252,7 @@ export const ViewerPage: React.FC = () => {
             canvas.style.width = pageStyleWidth;
             canvas.style.height = pageStyleHeight;
             canvas.style.maxWidth = isMobile ? '100%' : '920px';
-            canvas.style.margin = isMobile ? '0 0 12px 0' : '0 auto';
+            canvas.style.margin = isMobile ? '0' : '0 auto';
 
             const ctx = canvas.getContext('2d');
             if (ctx) {
@@ -283,12 +283,12 @@ export const ViewerPage: React.FC = () => {
           slot.style.justifyContent = 'center';
           slot.style.alignItems = 'center';
           slot.style.minHeight = `${estimatedHeightPx}px`;
-          slot.style.margin = isMobile ? '0 0 12px 0' : '0 auto 16px auto';
+          slot.style.margin = isMobile ? '0 0 2px 0' : '0 auto 16px auto';
           slot.style.padding = '0';
 
           if (i > 1) {
             slot.innerHTML = `
-              <div class="pdf-page-skeleton" style="width: ${pageStyleWidth}; height: ${pageStyleHeight}; min-height: ${estimatedHeightPx}px; border-radius: ${isMobile ? '0' : '8px'};">
+              <div class="pdf-page-skeleton" style="width: ${pageStyleWidth}; height: ${pageStyleHeight}; min-height: ${estimatedHeightPx}px; border-radius: ${isMobile ? '0' : '8px'}; margin: ${isMobile ? '0 0 2px 0' : '0 auto'};">
                 <span>Page ${i} of ${pdf.numPages}</span>
               </div>
             `;
@@ -410,6 +410,35 @@ export const ViewerPage: React.FC = () => {
     }
   };
 
+  const handleShare = async () => {
+    if (!material) return;
+    const isMobile = window.innerWidth <= 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent);
+    const fullUrl = window.location.href;
+    const title = material.title || 'Study Material';
+    const text = `Check out "${title}" on Study Book!`;
+
+    // On mobile devices, prioritize native Web Share API
+    if (isMobile && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url: fullUrl,
+        });
+        showToast('Shared successfully!', 'success');
+        return;
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          return;
+        }
+        console.warn('Native share error, falling back to modal:', err);
+      }
+    }
+
+    // Fallback to ShareModal on desktop or unsupported browsers
+    setIsShareOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="page-loader" style={{ minHeight: '100vh' }}>
@@ -487,7 +516,7 @@ export const ViewerPage: React.FC = () => {
             <span className="desktop-only">{isSaved ? 'Saved' : 'Save'}</span>
           </button>
 
-          <button className="v-action-btn" onClick={() => setIsShareOpen(true)} title="Share">
+          <button className="v-action-btn" onClick={handleShare} title="Share">
             <i className="fas fa-share-alt"></i>
             <span className="desktop-only">Share</span>
           </button>
@@ -535,13 +564,7 @@ export const ViewerPage: React.FC = () => {
 
             <div
               ref={containerRef}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '16px',
-                width: '100%',
-              }}
+              className="pdf-pages-list"
             >
               {/* Virtualized PDF page slots rendered dynamically */}
             </div>

@@ -1434,6 +1434,14 @@ body.dark-mode .doc-subtitle {
   transition: background-color 0.3s ease;
 }
 
+.pdf-pages-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
 .pdf-page-canvas {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
   background: #ffffff;
@@ -1508,10 +1516,16 @@ body.dark-mode .doc-subtitle {
     padding-right: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
   .viewer-top-bar {
     padding: 0 10px;
     height: 56px;
+    flex-shrink: 0;
   }
   .v-top-left {
     gap: 8px;
@@ -1553,50 +1567,72 @@ body.dark-mode .doc-subtitle {
     justify-content: center;
   }
   .viewer-layout-wrapper {
+    flex: 1 1 auto;
     height: calc(100vh - 56px);
+    height: calc(100dvh - 56px);
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
   }
   .viewer-main-content {
+    flex: 1 1 auto;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y !important;
   }
   .pdf-viewer-container {
-    padding: 8px 0 16px 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    gap: 10px;
+    padding: 0 0 16px 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box;
     background-color: var(--primary-bg);
+    touch-action: pan-y !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .pdf-pages-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    touch-action: pan-y !important;
   }
   .pdf-page-slot {
     width: 100% !important;
     max-width: 100% !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-bottom: 10px !important;
+    padding: 0 !important;
+    margin: 0 0 2px 0 !important;
+    touch-action: pan-y !important;
   }
   .pdf-page-canvas {
     max-width: 100% !important;
     width: 100% !important;
     height: auto !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 10px !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    border-left: none !important;
-    border-right: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
     border-radius: 0 !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: none !important;
     display: block;
+    touch-action: pan-y !important;
   }
   .pdf-page-skeleton {
     width: 100% !important;
@@ -1604,8 +1640,25 @@ body.dark-mode .doc-subtitle {
     border-left: none !important;
     border-right: none !important;
     border-radius: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin: 0 0 2px 0 !important;
+  }
+
+  /* Fullscreen mobile scrolling support */
+  #pdf-viewer-container:fullscreen,
+  .pdf-viewer-container:fullscreen,
+  #pdf-viewer-container:-webkit-full-screen,
+  .pdf-viewer-container:-webkit-full-screen {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    width: 100vw !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
+    touch-action: pan-y !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background-color: var(--primary-bg) !important;
   }
   .viewer-bottom-section {
     padding: 24px 12px;

@@ -61,6 +61,36 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           Share <strong>{title}</strong> with your classmates and study groups:
         </p>
 
+        {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+          <button
+            onClick={async () => {
+              try {
+                await navigator.share({
+                  title,
+                  text: `Check out "${title}" on Study Book!`,
+                  url: fullUrl,
+                });
+                onClose();
+              } catch (e: any) {
+                if (e.name !== 'AbortError') console.warn(e);
+              }
+            }}
+            className="btn btn-purple"
+            style={{
+              width: '100%',
+              marginBottom: '14px',
+              borderRadius: '10px',
+              gap: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 600,
+            }}
+          >
+            <i className="fas fa-share-alt"></i> Share with Apps
+          </button>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
           <button
             onClick={shareWhatsApp}
