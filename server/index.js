@@ -26,7 +26,7 @@ const SUPABASE_KEY =
   process.env.SUPABASE_SERVICE_ROLE_KEY ||
   process.env.SUPABASE_KEY ||
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  'sb_publishable_8k18qxwlsKGTM-Gtbt_H2A_V4120Wlz';
+  '';
 const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID || 'studybook-15297';
 
 // Initialize Firebase Admin SDK (Singleton)
@@ -75,15 +75,25 @@ const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_KEY, {
 });
 
 // Setup CORS
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'];
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'https://study-book-seven.vercel.app',
+  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()) : []),
+];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g. mobile apps, curl, or same-origin server-side calls)
-      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      // Allow requests with no origin (e.g. mobile apps, curl, or same-origin serverless calls)
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        process.env.NODE_ENV !== 'production'
+      ) {
         callback(null, true);
       } else {
         callback(new Error(`CORS blocked origin: ${origin}`));
@@ -92,6 +102,17 @@ app.use(
     credentials: true,
   })
 );
+
+// URL rewrite normalization middleware for Vercel serverless rewrites
+app.use((req, res, next) => {
+  if (
+    !req.url.startsWith('/api') &&
+    (req.url.startsWith('/storage') || req.url === '/health' || req.url.startsWith('/cron'))
+  ) {
+    req.url = '/api' + req.url;
+  }
+  next();
+});
 
 app.use(express.json());
 
@@ -243,8 +264,12 @@ app.post('/api/storage/download-url', async (req, res) => {
       return res.status(400).json({ error: 'Missing or invalid storagePath.' });
     }
 
-    // Prevent path traversal
-    if (storagePath.includes('..') || storagePath.startsWith('/')) {
+    // Normalize path and prevent path traversal
+    let cleanPath = storagePath.trim().replace(/^\/+/, '');
+    if (cleanPath.startsWith(`${BUCKET_NAME}/`)) {
+      cleanPath = cleanPath.slice(BUCKET_NAME.length + 1);
+    }
+    if (cleanPath.includes('..')) {
       return res.status(400).json({ error: 'Invalid storagePath format.' });
     }
 
@@ -266,7 +291,7 @@ app.post('/api/storage/download-url', async (req, res) => {
 
     const { data, error } = await supabaseAdmin.storage
       .from(BUCKET_NAME)
-      .createSignedUrl(storagePath, expirySeconds);
+      .createSignedUrl(cleanPath, expirySeconds);
 
     if (error) {
       console.error('[Supabase Storage Error] createSignedUrl:', error);
@@ -442,8 +467,8 @@ app.post('/api/storage/cleanup-expired', async (req, res) => {
   }
 });
 
-// Start listening if run directly
-if (process.env.NODE_ENV !== 'test') {
+// Start listening if run directly (skip when invoked inside Vercel serverless environment or tests)
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`[StudyBook Backend] Storage API running on http://localhost:${PORT}`);
     console.log(`[StudyBook Backend] Storage bucket: ${BUCKET_NAME}`);

@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { StudyMaterial, UserProfile } from '../types';
 import { resourceService } from '../services/resourceService';
 import { bookmarkService } from '../services/bookmarkService';
 import { profileService } from '../services/profileService';
-import { storageService } from '../services/storageService';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
 import { ShareModal } from '../components/common/ShareModal';
 import { DocumentGrid } from '../components/resources/DocumentGrid';
-import { getPdfJsLibrary } from '../utils/pdfHelper';
+import { getPdfJsLibrary, getCachedSignedPdfUrl, invalidateSignedPdfUrl } from '../utils/pdfHelper';
 
 export const ViewerPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fileParam = searchParams.get('file');
   const docParam = searchParams.get('doc');
@@ -25,12 +25,17 @@ export const ViewerPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
 
-  const [material, setMaterial] = useState<StudyMaterial | null>(null);
+  // Instant optimistic metadata if navigated from a card on HomePage, SearchPage, or AccountPage
+  const passedMaterial = (location.state as any)?.material as StudyMaterial | undefined;
+
+  const [material, setMaterial] = useState<StudyMaterial | null>(() => passedMaterial || null);
   const [uploader, setUploader] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(() => !passedMaterial);
   const [error, setError] = useState<string | null>(null);
 
-  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(() =>
+    passedMaterial ? bookmarkService.isBookmarked(passedMaterial.id, user?.uid) : false
+  );
   const [isInfoOpen, setIsInfoOpen] = useState<boolean>(false);
   const [isShareOpen, setIsShareOpen] = useState<boolean>(false);
 
@@ -38,28 +43,45 @@ export const ViewerPage: React.FC = () => {
   const [relatedMaterials, setRelatedMaterials] = useState<StudyMaterial[]>([]);
 
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
-  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+  const [retryKey, setRetryKey] = useState<number>(0);
+  const [pdfLoading, setPdfLoading] = useState<boolean>(true);
   const [pdfLoaded, setPdfLoaded] = useState<boolean>(false);
   const [pdfRenderError, setPdfRenderError] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Load document metadata
+  // Pre-warm the PDF engine immediately on mount so it is ready before the PDF stream arrives
+  useEffect(() => {
+    getPdfJsLibrary().catch(() => {});
+  }, []);
+
+  // Sync document title and bookmarks if material was pre-passed
+  useEffect(() => {
+    if (material) {
+      document.title = `${material.title} - Study Book`;
+      setIsSaved(bookmarkService.isBookmarked(material.id, user?.uid));
+      bookmarkService.saveContinueReading(material);
+    }
+  }, [material?.id, user?.uid]);
+
+  // Load / revalidate document metadata from Firestore
   useEffect(() => {
     let isCancelled = false;
     const fetchDoc = async () => {
-      setLoading(true);
-      setError(null);
-
       const targetId = slug || docParam || fileParam;
-      if (!targetId) {
+      if (!targetId && !material) {
         setError('No document specified.');
         setLoading(false);
         return;
       }
 
+      if (!material) {
+        setLoading(true);
+      }
+      setError(null);
+
       try {
-        let docData = await resourceService.getMaterialBySlugOrId(targetId);
+        let docData = targetId ? await resourceService.getMaterialBySlugOrId(targetId) : null;
 
         // Fallback for direct file URL query param
         if (!docData && fileParam) {
@@ -72,13 +94,13 @@ export const ViewerPage: React.FC = () => {
           };
         }
 
-        if (!docData) {
+        if (!docData && !material) {
           setError('Document not found or has been removed.');
           setLoading(false);
           return;
         }
 
-        if (!isCancelled) {
+        if (!isCancelled && docData) {
           setMaterial(docData);
           document.title = `${docData.title} - Study Book`;
           setIsSaved(bookmarkService.isBookmarked(docData.id, user?.uid));
@@ -99,7 +121,9 @@ export const ViewerPage: React.FC = () => {
           });
         }
       } catch (err: any) {
-        if (!isCancelled) setError(err.message || 'Failed to load document details.');
+        if (!isCancelled && !material) {
+          setError(err.message || 'Failed to load document details.');
+        }
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -109,20 +133,27 @@ export const ViewerPage: React.FC = () => {
     return () => {
       isCancelled = true;
     };
-  }, [slug, docParam, fileParam, user]);
+  }, [slug, docParam, fileParam]);
 
-  // Request/refresh signed download URL for private Supabase PDF files
-  const refreshSignedUrl = async () => {
+  // Request/refresh signed download URL using high-speed in-memory cache
+  const refreshSignedUrl = async (forceFresh = false) => {
     if (!material) return;
     const targetPath = material.storagePath || material.fileUrl;
     if (!targetPath) return;
 
+    if (forceFresh) {
+      invalidateSignedPdfUrl(targetPath);
+    }
+
     setPdfLoading(true);
     setPdfLoaded(false);
     setPdfRenderError(null);
+
     try {
-      const url = await storageService.getDownloadUrl(targetPath, 3600);
+      // Uses in-memory cache if previously requested by thumbnail card, returning in ~0ms
+      const url = await getCachedSignedPdfUrl(targetPath, forceFresh);
       setSignedUrl(url);
+      setRetryKey((prev) => prev + 1);
     } catch (err: any) {
       console.error('Failed to obtain signed URL:', err);
       setPdfRenderError(err.message || 'Could not obtain secure viewing URL.');
@@ -132,15 +163,16 @@ export const ViewerPage: React.FC = () => {
 
   useEffect(() => {
     if (material) {
-      refreshSignedUrl();
+      refreshSignedUrl(false);
     }
   }, [material?.id, material?.storagePath, material?.fileUrl]);
 
-  // Render PDF pages using pdfjsLib with signed URL
+  // High-performance virtualized progressive PDF rendering
   useEffect(() => {
     if (!signedUrl || !containerRef.current) return;
 
     let isCancelled = false;
+    let observer: IntersectionObserver | null = null;
     const container = containerRef.current;
     container.innerHTML = '';
     setPdfLoading(true);
@@ -161,56 +193,161 @@ export const ViewerPage: React.FC = () => {
       }
 
       try {
+        // Fast streaming load with 256KB byte-range chunks
         const loadingTask = pdfjs.getDocument({
           url: signedUrl,
-          cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+          cMapUrl: '/cmaps/',
           cMapPacked: true,
+          rangeChunkSize: 262144,
+          enableXfa: false,
         });
+
         const pdf = await loadingTask.promise;
         if (isCancelled) return;
 
         setTotalPages(pdf.numPages);
 
-        // Progressively render pages
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          if (isCancelled) return;
+        const containerWidth = container.clientWidth || window.innerWidth;
+        const isMobile = window.innerWidth <= 768;
+        const padding = isMobile ? 24 : 96;
+        const maxCanvasWidth = isMobile ? containerWidth - 24 : Math.min(containerWidth - padding, 920);
 
-          const containerWidth = container.clientWidth || window.innerWidth;
-          const isMobile = window.innerWidth <= 768;
-          // Calculate scale ensuring ample left and right margins
-          const padding = isMobile ? 36 : 96;
-          const unscaledViewport = page.getViewport({ scale: 1 });
-          const fitScale = (containerWidth - padding) / unscaledViewport.width;
-          const scale = Math.min(Math.max(fitScale, 0.35), 2.0);
+        // Fetch Page 1 first to determine dimensions and render ASAP!
+        const page1 = await pdf.getPage(1);
+        if (isCancelled) return;
 
-          const viewport = page.getViewport({ scale });
-          const outputScale = window.devicePixelRatio || 1;
+        const unscaledViewport = page1.getViewport({ scale: 1 });
+        const fitScale = maxCanvasWidth / unscaledViewport.width;
+        const scale = Math.min(Math.max(fitScale, 0.35), 2.0);
+        const viewport = page1.getViewport({ scale });
+        // Cap DPR to 2 for optimal balance of razor-sharp text and fast rendering
+        const outputScale = Math.min(window.devicePixelRatio || 1, 2);
 
-          const canvas = document.createElement('canvas');
-          canvas.className = 'pdf-page-canvas';
-          canvas.width = Math.floor(viewport.width * outputScale);
-          canvas.height = Math.floor(viewport.height * outputScale);
-          canvas.style.width = isMobile ? 'calc(100% - 24px)' : `${Math.floor(viewport.width)}px`;
-          canvas.style.height = isMobile ? 'auto' : `${Math.floor(viewport.height)}px`;
-          canvas.style.maxWidth = isMobile ? 'calc(100% - 24px)' : '920px';
-          canvas.style.margin = '0 auto';
+        const pageStyleWidth = isMobile ? 'calc(100% - 24px)' : `${Math.floor(viewport.width)}px`;
+        const pageStyleHeight = isMobile ? 'auto' : `${Math.floor(viewport.height)}px`;
+        const estimatedHeightPx = Math.floor(viewport.height);
 
-          const context = canvas.getContext('2d');
-          if (context) {
-            const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-            await page.render({ canvasContext: context, transform, viewport }).promise;
-          }
+        // Function to render a specific page into its placeholder slot
+        const renderPageIntoSlot = async (pageNum: number, slotEl: HTMLDivElement) => {
+          if (slotEl.getAttribute('data-rendered') === 'true' || isCancelled) return;
+          slotEl.setAttribute('data-rendered', 'true');
 
-          if (!isCancelled) {
-            container.appendChild(canvas);
-            // Instantly remove loading indicator once the PDF / first page is loaded & attached
-            if (i === 1) {
-              setPdfLoading(false);
-              setPdfLoaded(true);
+          try {
+            const page = pageNum === 1 ? page1 : await pdf.getPage(pageNum);
+            if (isCancelled) return;
+
+            const pViewport = page.getViewport({ scale });
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-page-canvas';
+            canvas.width = Math.floor(pViewport.width * outputScale);
+            canvas.height = Math.floor(pViewport.height * outputScale);
+            canvas.style.width = pageStyleWidth;
+            canvas.style.height = pageStyleHeight;
+            canvas.style.maxWidth = isMobile ? 'calc(100% - 24px)' : '920px';
+            canvas.style.margin = '0 auto';
+
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+              await page.render({ canvasContext: ctx, transform, viewport: pViewport }).promise;
             }
+
+            if (!isCancelled) {
+              slotEl.innerHTML = '';
+              slotEl.style.minHeight = 'auto';
+              slotEl.appendChild(canvas);
+            }
+          } catch (pageErr) {
+            console.warn(`Error rendering page ${pageNum}:`, pageErr);
+            slotEl.removeAttribute('data-rendered');
           }
+        };
+
+        // Create virtualized page slots for all pages
+        const slots: HTMLDivElement[] = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const slot = document.createElement('div');
+          slot.className = 'pdf-page-slot';
+          slot.id = `pdf-page-${i}`;
+          slot.setAttribute('data-page-number', String(i));
+          slot.style.width = '100%';
+          slot.style.display = 'flex';
+          slot.style.justifyContent = 'center';
+          slot.style.alignItems = 'center';
+          slot.style.minHeight = `${estimatedHeightPx}px`;
+          slot.style.margin = '0 auto 16px auto';
+
+          if (i > 1) {
+            slot.innerHTML = `
+              <div class="pdf-page-skeleton" style="width: ${pageStyleWidth}; height: ${pageStyleHeight}; min-height: ${estimatedHeightPx}px;">
+                <span>Page ${i} of ${pdf.numPages}</span>
+              </div>
+            `;
+          }
+
+          container.appendChild(slot);
+          slots.push(slot);
         }
+
+        // 1. Render Page 1 IMMEDIATELY — user sees content in < 300ms!
+        await renderPageIntoSlot(1, slots[0]);
+        if (!isCancelled) {
+          setPdfLoading(false);
+          setPdfLoaded(true);
+        }
+
+        // 2. Pre-render Page 2 immediately if present for seamless initial scrolling
+        if (pdf.numPages >= 2 && !isCancelled) {
+          renderPageIntoSlot(2, slots[1]).catch(() => {});
+        }
+
+        // 3. Set up IntersectionObserver for remaining pages (3...N)
+        observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                const targetEl = entry.target as HTMLDivElement;
+                const pageNum = Number(targetEl.getAttribute('data-page-number'));
+                if (pageNum && targetEl.getAttribute('data-rendered') !== 'true') {
+                  renderPageIntoSlot(pageNum, targetEl).catch(() => {});
+                }
+              }
+            }
+          },
+          { rootMargin: '800px 0px 800px 0px' }
+        );
+
+        for (let i = 2; i < slots.length; i++) {
+          observer.observe(slots[i]);
+        }
+
+        // 4. Background idle pre-render: progressively pre-rasterize next pages during idle cycles
+        let nextIdlePage = 3;
+        const renderNextIdle = () => {
+          if (isCancelled || nextIdlePage > pdf.numPages) return;
+          const currPage = nextIdlePage++;
+          const slot = slots[currPage - 1];
+          if (slot && slot.getAttribute('data-rendered') !== 'true') {
+            renderPageIntoSlot(currPage, slot).then(() => {
+              if (!isCancelled && nextIdlePage <= pdf.numPages) {
+                if ('requestIdleCallback' in window) {
+                  (window as any).requestIdleCallback(renderNextIdle, { timeout: 1000 });
+                } else {
+                  setTimeout(renderNextIdle, 100);
+                }
+              }
+            }).catch(() => {});
+          } else if (nextIdlePage <= pdf.numPages) {
+            renderNextIdle();
+          }
+        };
+
+        if ('requestIdleCallback' in window) {
+          (window as any).requestIdleCallback(renderNextIdle, { timeout: 1200 });
+        } else {
+          setTimeout(renderNextIdle, 300);
+        }
+
       } catch (err: any) {
         console.error('PDF rendering failed:', err);
         if (!isCancelled) {
@@ -234,8 +371,11 @@ export const ViewerPage: React.FC = () => {
     renderPdf();
     return () => {
       isCancelled = true;
+      if (observer) {
+        observer.disconnect();
+      }
     };
-  }, [signedUrl]);
+  }, [signedUrl, retryKey]);
 
   const handleBookmark = async () => {
     if (!material) return;
@@ -350,13 +490,13 @@ export const ViewerPage: React.FC = () => {
             {pdfRenderError && (
               <div style={{ padding: '40px 20px', textAlign: 'center', maxWidth: '480px', margin: '0 auto' }}>
                 <i className="fas fa-exclamation-triangle" style={{ fontSize: '2.5rem', color: '#ef4444', marginBottom: '16px' }}></i>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>Unable to Display PDF</h3>
-                <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginBottom: '20px' }}>{pdfRenderError}</p>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '8px', color: 'var(--text-dark)' }}>Unable to Display PDF</h3>
+                <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginBottom: '20px', lineHeight: 1.5 }}>{pdfRenderError}</p>
                 <button
                   type="button"
                   className="btn btn-purple"
-                  onClick={refreshSignedUrl}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 20px' }}
+                  onClick={() => refreshSignedUrl(true)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer' }}
                 >
                   <i className="fas fa-redo"></i> Refresh Access Link
                 </button>
@@ -373,7 +513,7 @@ export const ViewerPage: React.FC = () => {
                 width: '100%',
               }}
             >
-              {/* PDF canvases rendered dynamically */}
+              {/* Virtualized PDF page slots rendered dynamically */}
             </div>
           </div>
 

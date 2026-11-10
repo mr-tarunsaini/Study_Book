@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
 import { Layout } from './components/layout/Layout';
+import { getPdfJsLibrary } from './utils/pdfHelper';
 
 import { HomePage } from './pages/HomePage';
 import { SearchPage } from './pages/SearchPage';
@@ -24,6 +25,16 @@ const RedirectWithQuery: React.FC<{ to: string }> = ({ to }) => {
 };
 
 export const App: React.FC = () => {
+  // Pre-warm the self-hosted PDF engine in the background so PDF pages load instantly
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const timer = setTimeout(() => {
+        getPdfJsLibrary().catch(() => {});
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   return (
     <ThemeProvider>
       <ToastProvider>

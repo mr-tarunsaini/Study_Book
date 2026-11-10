@@ -70,7 +70,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ material, onBookmark
 
         const loadingTask = pdfjs.getDocument({
           url: downloadUrl,
-          cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+          cMapUrl: '/cmaps/',
           cMapPacked: true,
         });
 
@@ -128,7 +128,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ material, onBookmark
   const targetUrl = `/notes/${material.slug || material.id}`;
 
   return (
-    <Link to={targetUrl} className="document-card" onClick={handleClick}>
+    <Link to={targetUrl} state={{ material }} className="document-card" onClick={handleClick}>
       <div className="doc-preview-container">
         {/* Floating circular bookmark button positioned top right of preview */}
         <button

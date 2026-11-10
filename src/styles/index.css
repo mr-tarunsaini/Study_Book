@@ -755,9 +755,9 @@ body.canva-mode .navbar {
 }
 
 .document-grid .document-card {
-  flex: 0 0 260px;
-  min-width: 260px;
-  width: 260px;
+  flex: 0 0 215px;
+  min-width: 215px;
+  width: 215px;
   scroll-snap-align: start;
 }
 
@@ -769,9 +769,9 @@ body.canva-mode .navbar {
 /* Search results should remain a wrapped multi-column grid on desktop */
 .document-grid.search-results-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)) !important;
   overflow-x: visible !important;
-  gap: 24px !important;
+  gap: 18px !important;
   padding: 0 !important;
   margin-bottom: 40px !important;
 }
@@ -800,14 +800,14 @@ body.canva-mode .navbar {
   }
 
   .document-grid .document-card {
-    flex: 0 0 240px;
-    min-width: 240px;
-    width: 240px;
+    flex: 0 0 185px;
+    min-width: 185px;
+    width: 185px;
     scroll-snap-align: start;
   }
 
   .document-grid .document-card .doc-preview-container {
-    height: 160px;
+    height: 135px;
   }
 
   .document-grid .empty-state {
@@ -837,8 +837,8 @@ body.canva-mode .navbar {
 .document-card {
   background-color: var(--card-bg);
   border: 1.5px solid var(--border-color);
-  border-radius: 20px;
-  padding: 14px;
+  border-radius: 16px;
+  padding: 10px 10px 12px 10px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -855,9 +855,10 @@ body.canva-mode .navbar {
 }
 
 .doc-preview-container {
-  height: 190px;
+  height: 152px;
   background-color: #f8fafc;
-  border-radius: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -874,7 +875,7 @@ body.dark-mode .doc-preview-container {
   height: 100%;
   object-fit: cover;
   object-position: top center;
-  border-radius: 14px;
+  border-radius: 11px;
 }
 
 .preview-spinner-box {
@@ -890,18 +891,18 @@ body.dark-mode .doc-preview-container {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   color: var(--text-light);
   user-select: none;
 }
 
 .preview-fallback .preview-doc-icon i {
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   color: #0086ff;
 }
 
 .preview-unavailable-text {
-  font-size: 0.88rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #64748b;
   letter-spacing: -0.01em;
@@ -914,10 +915,10 @@ body.dark-mode .preview-unavailable-text {
 /* Floating circular bookmark button positioned top right of preview */
 .floating-bookmark-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 34px;
-  height: 34px;
+  top: 7px;
+  right: 7px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -927,7 +928,7 @@ body.dark-mode .preview-unavailable-text {
   justify-content: center;
   cursor: pointer;
   color: #64748b;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   z-index: 5;
 }
@@ -954,18 +955,18 @@ body.dark-mode .floating-bookmark-btn {
 }
 
 .doc-info {
-  padding: 12px 2px 2px 2px;
+  padding: 8px 2px 2px 2px;
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
 .doc-title {
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 0.92rem;
+  font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 6px;
-  line-height: 1.35;
+  margin-bottom: 4px;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -973,10 +974,10 @@ body.dark-mode .floating-bookmark-btn {
 }
 
 .doc-subtitle {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   color: #64748b;
   font-weight: 500;
-  line-height: 1.45;
+  line-height: 1.35;
   word-break: break-word;
 }
 
@@ -1420,9 +1421,34 @@ body.dark-mode .doc-subtitle {
   background: #ffffff;
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  margin: 0 auto 16px auto;
+  margin: 0 auto;
   max-width: calc(100% - 32px);
   height: auto;
+  display: block;
+}
+
+.pdf-page-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto 16px auto;
+  position: relative;
+}
+
+.pdf-page-skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: opacity 0.2s ease;
 }
 
 .viewer-bottom-section {
@@ -1490,7 +1516,7 @@ body.dark-mode .doc-subtitle {
     gap: 14px;
     width: 100%;
     box-sizing: border-box;
-    background-color: #ffffff;
+    background-color: var(--primary-bg);
   }
   .pdf-page-canvas {
     max-width: calc(100% - 20px) !important;
@@ -1499,7 +1525,7 @@ body.dark-mode .doc-subtitle {
     margin: 0 auto 14px auto !important;
     border-radius: 6px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     display: block;
   }
   .viewer-bottom-section {

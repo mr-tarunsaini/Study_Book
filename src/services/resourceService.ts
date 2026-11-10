@@ -212,10 +212,31 @@ class FirestoreResourceService implements IResourceService {
 
   async getUserMaterials(uid: string): Promise<StudyMaterial[]> {
     try {
-      const q = query(collection(db, 'study_materials'), where('uploaderUid', '==', uid));
-      const snap = await getDocs(q);
-      const list: StudyMaterial[] = [];
-      snap.forEach((d) => list.push({ id: d.id, ...d.data() } as StudyMaterial));
+      const map = new Map<string, StudyMaterial>();
+
+      // 1. Query by uploaderUid
+      try {
+        const q1 = query(collection(db, 'study_materials'), where('uploaderUid', '==', uid));
+        const snap1 = await getDocs(q1);
+        snap1.forEach((d) => map.set(d.id, { id: d.id, ...d.data() } as StudyMaterial));
+      } catch (err) {
+        console.warn('Error querying by uploaderUid:', err);
+      }
+
+      // 2. Fallback query by legacy uploadedBy field
+      try {
+        const q2 = query(collection(db, 'study_materials'), where('uploadedBy', '==', uid));
+        const snap2 = await getDocs(q2);
+        snap2.forEach((d) => {
+          if (!map.has(d.id)) {
+            map.set(d.id, { id: d.id, ...d.data() } as StudyMaterial);
+          }
+        });
+      } catch (err) {
+        console.warn('Error querying by uploadedBy:', err);
+      }
+
+      const list = Array.from(map.values());
       list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       return list.filter((m) => !isDummyMaterial(m));
     } catch (e) {

@@ -464,6 +464,7 @@ export const AccountPage: React.FC = () => {
                   <div className="upload-actions">
                     <Link
                       to={`/notes/${mat.slug || mat.id}`}
+                      state={{ material: mat }}
                       className="btn btn-outline"
                       style={{ flex: 1, padding: '8px', fontSize: '0.9rem', borderRadius: '6px' }}
                     >
@@ -538,6 +539,7 @@ export const AccountPage: React.FC = () => {
                   <div className="upload-actions">
                     <Link
                       to={`/notes/${mat.slug || mat.id}`}
+                      state={{ material: mat }}
                       className="btn btn-outline full-width"
                       style={{ padding: '8px', fontSize: '0.9rem', borderRadius: '6px' }}
                     >

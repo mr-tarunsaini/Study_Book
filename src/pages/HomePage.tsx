@@ -141,7 +141,7 @@ export const HomePage: React.FC = () => {
                     className="live-search-item"
                     onClick={() => {
                       setIsLiveOpen(false);
-                      navigate(`/notes/${item.slug || item.id}`);
+                      navigate(`/notes/${item.slug || item.id}`, { state: { material: item } });
                     }}
                   >
                     <div className="live-search-icon">
@@ -289,7 +289,21 @@ export const HomePage: React.FC = () => {
         <button
           type="button"
           className="btn btn-purple"
-          onClick={() => setIsUploadOpen(true)}
+          onClick={(e) => {
+            if (!user) {
+              e.preventDefault();
+              showToast('Please log in before uploading study materials.', 'warning');
+              navigate('/login');
+              return;
+            }
+            if (!user.college || !user.course || !user.branch) {
+              e.preventDefault();
+              showToast('Please complete your profile in the Account page before uploading.', 'warning');
+              navigate('/account');
+              return;
+            }
+            setIsUploadOpen(true);
+          }}
           style={{ padding: '12px 28px', fontSize: '1rem', cursor: 'pointer' }}
         >
           <i className="fas fa-upload"></i> Upload Notes
