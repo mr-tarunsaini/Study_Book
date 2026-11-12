@@ -48,9 +48,13 @@ export default async function handler(req, res) {
       });
     }
 
+    // Return the Vercel-proxied view URL which prevents client-side ERR_CONNECTION_TIMED_OUT on mobile/Jio networks
+    const proxyUrl = `/api/storage/view?path=${encodeURIComponent(cleanPath)}`;
+
     return res.status(200).json({
       success: true,
-      signedUrl: data.signedUrl,
+      signedUrl: proxyUrl,
+      directSignedUrl: data.signedUrl,
       expiresIn: expirySeconds,
       storagePath,
     });

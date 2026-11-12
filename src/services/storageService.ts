@@ -85,24 +85,60 @@ class HybridStorageService implements IStorageService {
 
     // 4. Upload PDF directly to Supabase Storage using the signed upload token
     onProgress?.(55, 'Uploading PDF...');
-    const { error: uploadError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .uploadToSignedUrl(path, token, file, {
-        contentType: 'application/pdf',
-        upsert: false,
+    let uploadSuccessful = false;
+    let finalPath = path;
+
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .uploadToSignedUrl(path, token, file, {
+          contentType: 'application/pdf',
+          upsert: false,
+        });
+
+      if (!uploadError) {
+        uploadSuccessful = true;
+      } else {
+        console.warn('[Supabase Upload Warning] Direct upload error:', uploadError.message);
+      }
+    } catch (directErr: any) {
+      console.warn('[Supabase Upload Warning] Direct connection failed or timed out:', directErr.message);
+    }
+
+    // Resilient fallback: If direct upload to Supabase timed out or failed, upload via secure serverless relay
+    if (!uploadSuccessful) {
+      onProgress?.(70, 'Using secure server relay upload...');
+      const proxyRes = await fetch(`${apiBase}/api/storage/upload-file`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/pdf',
+          Authorization: `Bearer ${idToken}`,
+          'x-file-name': encodeURIComponent(file.name),
+        },
+        body: file,
       });
 
-    if (uploadError) {
-      console.error('[Supabase Upload Error]', uploadError);
-      throw new Error(`Upload to storage failed: ${uploadError.message}`);
+      if (!proxyRes.ok) {
+        let proxyErrMsg = 'Failed to upload document.';
+        try {
+          const proxyErrJson = await proxyRes.json();
+          proxyErrMsg = proxyErrJson.error || proxyErrJson.details || proxyErrMsg;
+        } catch {
+          proxyErrMsg = `${proxyErrMsg} (HTTP ${proxyRes.status})`;
+        }
+        throw new Error(proxyErrMsg);
+      }
+
+      const proxyData = await proxyRes.json();
+      finalPath = proxyData.storagePath || finalPath;
     }
 
     onProgress?.(90, 'Verifying upload integrity...');
 
     return {
-      storagePath: path,
+      storagePath: finalPath,
       storageProvider: 'supabase',
-      fileUrl: path, // Use path as identifier; Viewer fetches fresh signed URL
+      fileUrl: finalPath, // Use path as identifier; Viewer fetches fresh signed URL
     };
   }
 
@@ -163,7 +199,11 @@ class HybridStorageService implements IStorageService {
     }
 
     const data = await res.json();
-    return data.signedUrl;
+    const rawUrl = data.signedUrl;
+    if (rawUrl && rawUrl.startsWith('/')) {
+      return `${apiBase}${rawUrl}`;
+    }
+    return rawUrl;
   }
 
   /**
