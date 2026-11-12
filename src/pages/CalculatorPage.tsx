@@ -3,84 +3,84 @@ import { AktuSubject } from '../types';
 
 export const AKTU_SUBJECTS: Record<string, AktuSubject[]> = {
   sem1: [
-    { name: 'Engineering Physics', credit: 4 },
-    { name: 'Engineering Mathematics-I', credit: 4 },
-    { name: 'Fundamentals of Electrical Engineering', credit: 3 },
-    { name: 'Programming for Problem Solving (PPS)', credit: 3 },
-    { name: 'Environment & Ecology', credit: 2 },
-    { name: 'Engineering Physics Lab', credit: 1 },
-    { name: 'Basic Electrical Engineering Lab', credit: 1 },
-    { name: 'Programming for Problem Solving Lab', credit: 1 },
-    { name: 'Engineering Graphics & Design Practice', credit: 2 },
+    { name: 'Engg Physics', credit: 4 },
+    { name: 'Engg Math-I', credit: 4 },
+    { name: 'Basic Electrical', credit: 3 },
+    { name: 'PPS', credit: 3 },
+    { name: 'Ecology', credit: 3 },
+    { name: 'Physics Lab', credit: 1 },
+    { name: 'Electrical Lab', credit: 1 },
+    { name: 'PPS Lab', credit: 1 },
+    { name: 'Engg Graphics', credit: 2 },
   ],
   sem2: [
-    { name: 'Engineering Chemistry', credit: 4 },
-    { name: 'Engineering Mathematics-II', credit: 4 },
-    { name: 'Fundamentals of Electronics Engineering', credit: 3 },
-    { name: 'Fundamentals of Mechanical Engineering', credit: 3 },
+    { name: 'Engg Chemistry', credit: 4 },
+    { name: 'Engg Math-II', credit: 4 },
+    { name: 'Basic Electronics', credit: 3 },
+    { name: 'Basic Mechanical', credit: 3 },
     { name: 'Soft Skills', credit: 2 },
-    { name: 'Engineering Chemistry Lab', credit: 1 },
-    { name: 'Electronics Engineering Lab', credit: 1 },
-    { name: 'English Language Lab', credit: 1 },
+    { name: 'Chemistry Lab', credit: 1 },
+    { name: 'Electronics Lab', credit: 1 },
+    { name: 'English Lab', credit: 1 },
     { name: 'Workshop Practice', credit: 2 },
   ],
   sem3: [
-    { name: 'Mathematics-III (PDE & Statistics)', credit: 4 },
-    { name: 'Universal Human Values (UHV)', credit: 3 },
+    { name: 'Maths-III', credit: 4 },
+    { name: 'Universal Human Values', credit: 3 },
     { name: 'Data Structures', credit: 4 },
-    { name: 'Computer Organization & Architecture (COA)', credit: 4 },
-    { name: 'Discrete Structures & Theory of Logic (DSTL)', credit: 3 },
+    { name: 'COA', credit: 4 },
+    { name: 'DSTL', credit: 3 },
     { name: 'Data Structures Lab', credit: 1 },
-    { name: 'Computer Organization Lab', credit: 1 },
-    { name: 'Web Designing Workshop', credit: 1 },
-    { name: 'Mini Project / Internship Assessment', credit: 2 },
+    { name: 'COA Lab', credit: 1 },
+    { name: 'Web Designing', credit: 1 },
+    { name: 'Mini Project', credit: 2 },
   ],
   sem4: [
-    { name: 'Maths-IV / Science Based Open Elective', credit: 4 },
+    { name: 'Maths-IV', credit: 4 },
     { name: 'Technical Communication', credit: 3 },
     { name: 'Operating Systems', credit: 4 },
-    { name: 'Theory of Automata & Formal Languages (TAFL)', credit: 4 },
-    { name: 'Object Oriented Programming (OOP)', credit: 3 },
+    { name: 'TAFL', credit: 4 },
+    { name: 'OOPs', credit: 3 },
     { name: 'Operating Systems Lab', credit: 1 },
-    { name: 'Object Oriented Programming Lab', credit: 1 },
-    { name: 'Cyber Security Workshop', credit: 1 },
-    { name: 'Python Programming Lab', credit: 2 },
+    { name: 'OOPs Lab', credit: 1 },
+    { name: 'Cyber Security', credit: 1 },
+    { name: 'Python Lab', credit: 2 },
   ],
   sem5: [
-    { name: 'Database Management Systems (DBMS)', credit: 4 },
-    { name: 'Design & Analysis of Algorithms (DAA)', credit: 4 },
+    { name: 'DBMS', credit: 4 },
+    { name: 'DAA', credit: 4 },
     { name: 'Web Technology', credit: 4 },
-    { name: 'Departmental Elective-I', credit: 3 },
-    { name: 'Departmental Elective-II', credit: 3 },
+    { name: 'Dept Elective-I', credit: 3 },
+    { name: 'Dept Elective-II', credit: 3 },
     { name: 'DBMS Lab', credit: 1 },
     { name: 'DAA Lab', credit: 1 },
-    { name: 'Web Technology Lab', credit: 1 },
-    { name: 'Mini Project / Internship Assessment', credit: 2 },
+    { name: 'Web Tech Lab', credit: 1 },
+    { name: 'Mini Project', credit: 2 },
   ],
   sem6: [
     { name: 'Software Engineering', credit: 4 },
     { name: 'Compiler Design', credit: 4 },
     { name: 'Computer Networks', credit: 4 },
-    { name: 'Departmental Elective-III', credit: 3 },
+    { name: 'Dept Elective-III', credit: 3 },
     { name: 'Open Elective-I', credit: 3 },
-    { name: 'Software Engineering Lab', credit: 1 },
-    { name: 'Compiler Design Lab', credit: 1 },
-    { name: 'Computer Networks Lab', credit: 1 },
+    { name: 'Software Engg Lab', credit: 1 },
+    { name: 'Compiler Lab', credit: 1 },
+    { name: 'Networks Lab', credit: 1 },
   ],
   sem7: [
-    { name: 'Artificial Intelligence & Machine Learning', credit: 3 },
-    { name: 'Departmental Elective-IV', credit: 3 },
-    { name: 'Departmental Elective-V', credit: 3 },
+    { name: 'AI & Machine Learning', credit: 3 },
+    { name: 'Dept Elective-IV', credit: 3 },
+    { name: 'Dept Elective-V', credit: 3 },
     { name: 'Open Elective-II', credit: 3 },
-    { name: 'Artificial Intelligence Lab', credit: 1 },
-    { name: 'Industrial Training / Internship Assessment', credit: 2 },
+    { name: 'AI Lab', credit: 1 },
+    { name: 'Internship Assessment', credit: 2 },
     { name: 'Project-I', credit: 4 },
   ],
   sem8: [
     { name: 'Open Elective-III', credit: 3 },
     { name: 'Open Elective-IV', credit: 3 },
-    { name: 'Project-II / Capstone Project', credit: 9 },
-    { name: 'Comprehensive Viva / Seminar', credit: 1 },
+    { name: 'Project-II', credit: 9 },
+    { name: 'Comprehensive Viva', credit: 1 },
   ],
 };
 
@@ -120,12 +120,17 @@ export const convertMarksToGrade = (val: string): { grade: string; point: number
   }
 };
 
+interface CalcSubjectItem {
+  name: string;
+  credit: number | string;
+}
+
 export const CalculatorPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'calc-sgpa' | 'calc-ygpa' | 'calc-cgpa'>('calc-sgpa');
 
   // SGPA state
   const [selectedSem, setSelectedSem] = useState<string>('sem1');
-  const [subjects, setSubjects] = useState<AktuSubject[]>(() =>
+  const [subjects, setSubjects] = useState<CalcSubjectItem[]>(() =>
     (AKTU_SUBJECTS['sem1'] || []).map((s) => ({ ...s }))
   );
   const [grades, setGrades] = useState<Record<string, string>>({});
@@ -151,32 +156,46 @@ export const CalculatorPage: React.FC = () => {
     setSgpaResult('0.00');
   };
 
-  const handleCreditChange = (idx: number, delta: number) => {
+  const handleCreditInput = (idx: number, raw: string) => {
     setSubjects((prev) => {
       const copy = [...prev];
-      const currentCredit = copy[idx].credit || 1;
-      const newCredit = Math.max(1, Math.min(20, currentCredit + delta));
-      copy[idx] = { ...copy[idx], credit: newCredit };
+      if (raw === '') {
+        copy[idx] = { ...copy[idx], credit: '' };
+      } else {
+        const val = parseInt(raw, 10);
+        copy[idx] = {
+          ...copy[idx],
+          credit: isNaN(val) ? '' : Math.min(20, Math.max(0, val)),
+        };
+      }
       return copy;
     });
   };
 
-  const handleDirectCreditSet = (idx: number, rawVal: string) => {
-    const num = parseInt(rawVal, 10);
-    const clamped = Math.max(1, Math.min(20, isNaN(num) ? 1 : num));
+  const handleCreditBlur = (idx: number) => {
     setSubjects((prev) => {
       const copy = [...prev];
-      copy[idx] = { ...copy[idx], credit: clamped };
+      const c = copy[idx]?.credit;
+      if (c === '' || isNaN(Number(c)) || Number(c) < 1) {
+        copy[idx] = { ...copy[idx], credit: 1 };
+      }
       return copy;
     });
   };
 
   const handleGradeChange = (index: number, rawVal: string) => {
+    if (rawVal === '') {
+      setGrades((prev) => {
+        const copy = { ...prev };
+        delete copy[index];
+        return copy;
+      });
+      return;
+    }
     let val = rawVal.trim();
     const num = parseFloat(val);
     if (!isNaN(num)) {
       if (num > 100) val = '100';
-      else if (num < 0) val = '0';
     } else {
       val = val.toUpperCase().slice(0, 2);
     }
@@ -210,7 +229,7 @@ export const CalculatorPage: React.FC = () => {
     subjects.forEach((sub, idx) => {
       const val = grades[idx] || '';
       const { point } = convertMarksToGrade(val);
-      const credit = sub.credit || 0;
+      const credit = Number(sub.credit) || 0;
       totalCreditPoints += point * credit;
       totalCredits += credit;
     });
@@ -266,7 +285,7 @@ export const CalculatorPage: React.FC = () => {
 
   return (
     <div style={{ paddingTop: '20px', paddingBottom: '40px' }}>
-      {/* Internal Hero - Matching calculator.html */}
+      {/* Internal Hero */}
       <div className="internal-hero">
         <h1>AKTU B Tech CGPA Calculator</h1>
         <p>
@@ -276,41 +295,42 @@ export const CalculatorPage: React.FC = () => {
       </div>
 
       <section className="content-section" id="calculator">
-        {/* Tabs - Matching calculator.html */}
-        <div className="tabs-container">
+        {/* Responsive Pill Tabs */}
+        <div className="calc-pill-tabs">
           <button
-            className={`tab-btn ${activeTab === 'calc-sgpa' ? 'active' : ''}`}
-            data-tab="calc-sgpa"
+            type="button"
+            className={`calc-pill-tab ${activeTab === 'calc-sgpa' ? 'active' : ''}`}
             onClick={() => setActiveTab('calc-sgpa')}
           >
             SGPA Calculator
           </button>
           <button
-            className={`tab-btn ${activeTab === 'calc-ygpa' ? 'active' : ''}`}
-            data-tab="calc-ygpa"
+            type="button"
+            className={`calc-pill-tab ${activeTab === 'calc-ygpa' ? 'active' : ''}`}
             onClick={() => setActiveTab('calc-ygpa')}
           >
             YGPA Calculator
           </button>
           <button
-            className={`tab-btn ${activeTab === 'calc-cgpa' ? 'active' : ''}`}
-            data-tab="calc-cgpa"
+            type="button"
+            className={`calc-pill-tab ${activeTab === 'calc-cgpa' ? 'active' : ''}`}
             onClick={() => setActiveTab('calc-cgpa')}
           >
             CGPA Calculator
           </button>
         </div>
 
-        {/* SGPA Calculator Tab - Matching calculator.html */}
+        {/* SGPA Calculator Tab */}
         {activeTab === 'calc-sgpa' && (
           <div className="tab-content active" id="calc-sgpa">
             <div className="calc-box">
-              <div className="calc-row" style={{ gridTemplateColumns: '1fr' }}>
+              <div style={{ marginBottom: '18px' }}>
                 <select
-                  className="calc-input"
+                  className="calc-select"
                   id="semester-select"
                   value={selectedSem}
                   onChange={(e) => handleSemesterSelect(e.target.value)}
+                  aria-label="Select Semester"
                 >
                   <option value="">Select Semester</option>
                   <option value="sem1">Semester 1</option>
@@ -324,112 +344,82 @@ export const CalculatorPage: React.FC = () => {
                 </select>
               </div>
 
-              <div id="sgpa-rows" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px' }}>
-                {subjects.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '30px 10px', color: 'var(--text-light)' }}>
-                    <i className="fas fa-graduation-cap" style={{ fontSize: '1.8rem', marginBottom: '8px', display: 'block', opacity: 0.6 }}></i>
-                    Please select a semester above to view the AKTU syllabus subjects and calculate SGPA.
-                  </div>
-                ) : (
-                  subjects.map((sub, idx) => {
-                    const val = grades[idx] || '';
-                    const gradeInfo = convertMarksToGrade(val);
-
-                    return (
-                      <div key={idx} className="calc-subject-row">
-                        <div style={{ flex: 1, minWidth: 0, paddingRight: '8px' }}>
-                          <div style={{ fontWeight: 600, fontSize: '0.94rem', color: 'var(--text-dark)' }}>
-                            {sub.name}
-                          </div>
-                        </div>
-
-                        <div className="calc-subject-controls">
-                          {/* Interactive Credit Stepper */}
-                          <div className="credit-stepper" title="Adjust subject credits">
-                            <span className="credit-label">Credit:</span>
-                            <button
-                              type="button"
-                              className="credit-stepper-btn"
-                              onClick={() => handleCreditChange(idx, -1)}
-                              title="Decrease credit"
-                              disabled={sub.credit <= 1}
-                              aria-label={`Decrease credit for ${sub.name}`}
-                            >
-                              <i className="fas fa-minus"></i>
-                            </button>
-                            <input
-                              type="number"
-                              className="credit-stepper-input"
-                              value={sub.credit}
-                              min="1"
-                              max="20"
-                              onChange={(e) => handleDirectCreditSet(idx, e.target.value)}
-                              aria-label={`Credit for ${sub.name}`}
-                            />
-                            <button
-                              type="button"
-                              className="credit-stepper-btn"
-                              onClick={() => handleCreditChange(idx, 1)}
-                              title="Increase credit"
-                              disabled={sub.credit >= 20}
-                              aria-label={`Increase credit for ${sub.name}`}
-                            >
-                              <i className="fas fa-plus"></i>
-                            </button>
-                          </div>
-
-                          {/* Marks or Grade Input with Grade Badge */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <input
-                              type="text"
-                              placeholder="Marks or Grade"
-                              className="calc-input"
-                              style={{ width: '135px', padding: '8px 10px', textAlign: 'center' }}
-                              value={grades[idx] || ''}
-                              onChange={(e) => handleGradeChange(idx, e.target.value)}
-                              maxLength={5}
-                            />
-                            {gradeInfo.grade !== '-' && (
-                              <span
-                                className={`grade-badge grade-${gradeInfo.grade.toLowerCase()}`}
-                                title={`Grade: ${gradeInfo.grade} (Point: ${gradeInfo.point})`}
-                              >
-                                {gradeInfo.grade}
-                              </span>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveSubject(idx)}
-                              title="Remove subject"
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--text-light)',
-                                cursor: 'pointer',
-                                padding: '4px',
-                                fontSize: '0.85rem',
-                              }}
-                              aria-label={`Remove ${sub.name}`}
-                            >
-                              <i className="fas fa-times"></i>
-                            </button>
-                          </div>
-                        </div>
+              {subjects.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '30px 10px', color: 'var(--text-light)' }}>
+                  <i className="fas fa-graduation-cap" style={{ fontSize: '1.8rem', marginBottom: '8px', display: 'block', opacity: 0.6 }}></i>
+                  Please select a semester above to view the AKTU syllabus subjects and calculate SGPA.
+                </div>
+              ) : (
+                <div className="calc-subject-list">
+                  {subjects.map((sub, idx) => (
+                    <div key={idx} className="calc-subject-item">
+                      <span className="calc-subject-title">{sub.name}</span>
+                      <div className="calc-inputs-group">
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          className="calc-credit-input"
+                          value={sub.credit}
+                          min={1}
+                          max={20}
+                          onChange={(e) => handleCreditInput(idx, e.target.value)}
+                          onBlur={() => handleCreditBlur(idx)}
+                          aria-label={`Credits for ${sub.name}`}
+                        />
+                        <input
+                          type="text"
+                          className="calc-grade-input"
+                          placeholder="Grade/Pt"
+                          value={grades[idx] || ''}
+                          onChange={(e) => handleGradeChange(idx, e.target.value)}
+                          maxLength={5}
+                          aria-label={`Grade for ${sub.name}`}
+                        />
+                        {subjects.length > (AKTU_SUBJECTS[selectedSem]?.length || 0) && idx >= (AKTU_SUBJECTS[selectedSem]?.length || 0) && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSubject(idx)}
+                            title="Remove added subject"
+                            aria-label={`Remove ${sub.name}`}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: 'var(--text-light)',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              fontSize: '0.85rem',
+                            }}
+                          >
+                            <i className="fas fa-times"></i>
+                          </button>
+                        )}
                       </div>
-                    );
-                  })
-                )}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {subjects.length > 0 && (
-                <div style={{ marginTop: '12px', textAlign: 'right' }}>
+                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
                   <button
                     type="button"
                     onClick={handleAddSubject}
-                    className="btn btn-outline"
-                    style={{ fontSize: '0.82rem', padding: '6px 12px' }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#0080ff',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                    }}
                   >
-                    <i className="fas fa-plus" style={{ marginRight: '6px' }}></i> Add Subject
+                    <i className="fas fa-plus"></i> Add Subject
                   </button>
                 </div>
               )}
@@ -447,7 +437,7 @@ export const CalculatorPage: React.FC = () => {
           </div>
         )}
 
-        {/* YGPA Calculator Tab - Matching calculator.html */}
+        {/* YGPA Calculator Tab */}
         {activeTab === 'calc-ygpa' && (
           <div className="tab-content active" id="calc-ygpa">
             <div className="calc-box">
@@ -505,108 +495,28 @@ export const CalculatorPage: React.FC = () => {
           </div>
         )}
 
-        {/* CGPA Calculator Tab - Matching calculator.html */}
+        {/* CGPA Calculator Tab */}
         {activeTab === 'calc-cgpa' && (
           <div className="tab-content active" id="calc-cgpa">
             <div className="calc-box">
-              <p style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text-light)' }}>
+              <p style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text-light)', fontWeight: 500 }}>
                 Enter SGPAs for completed semesters
               </p>
               
-              {/* Row 1: Sem 1 & Sem 2 */}
-              <div className="calc-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <input
-                  type="number"
-                  className="calc-input cgpa-input"
-                  placeholder="Sem 1 SGPA"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpaList[0]}
-                  onChange={(e) => handleCgpaInputChange(0, e.target.value)}
-                />
-                <input
-                  type="number"
-                  className="calc-input cgpa-input"
-                  placeholder="Sem 2 SGPA"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpaList[1]}
-                  onChange={(e) => handleCgpaInputChange(1, e.target.value)}
-                />
-              </div>
-
-              {/* Row 2: Sem 3 & Sem 4 */}
-              <div className="calc-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <input
-                  type="number"
-                  className="calc-input cgpa-input"
-                  placeholder="Sem 3 SGPA"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpaList[2]}
-                  onChange={(e) => handleCgpaInputChange(2, e.target.value)}
-                />
-                <input
-                  type="number"
-                  className="calc-input cgpa-input"
-                  placeholder="Sem 4 SGPA"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpaList[3]}
-                  onChange={(e) => handleCgpaInputChange(3, e.target.value)}
-                />
-              </div>
-
-              {/* Row 3: Sem 5 & Sem 6 */}
-              <div className="calc-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <input
-                  type="number"
-                  className="calc-input cgpa-input"
-                  placeholder="Sem 5 SGPA"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpaList[4]}
-                  onChange={(e) => handleCgpaInputChange(4, e.target.value)}
-                />
-                <input
-                  type="number"
-                  className="calc-input cgpa-input"
-                  placeholder="Sem 6 SGPA"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpaList[5]}
-                  onChange={(e) => handleCgpaInputChange(5, e.target.value)}
-                />
-              </div>
-
-              {/* Row 4: Sem 7 & Sem 8 */}
-              <div className="calc-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <input
-                  type="number"
-                  className="calc-input cgpa-input"
-                  placeholder="Sem 7 SGPA"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpaList[6]}
-                  onChange={(e) => handleCgpaInputChange(6, e.target.value)}
-                />
-                <input
-                  type="number"
-                  className="calc-input cgpa-input"
-                  placeholder="Sem 8 SGPA"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpaList[7]}
-                  onChange={(e) => handleCgpaInputChange(7, e.target.value)}
-                />
+              <div className="calc-cgpa-grid">
+                {cgpaList.map((val, idx) => (
+                  <input
+                    key={idx}
+                    type="number"
+                    className="calc-input cgpa-input"
+                    placeholder={`Sem ${idx + 1} SGPA`}
+                    step="0.01"
+                    min="0"
+                    max="10"
+                    value={val}
+                    onChange={(e) => handleCgpaInputChange(idx, e.target.value)}
+                  />
+                ))}
               </div>
 
               <div className="calc-actions">
