@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useToast } from '../../context/ToastContext';
@@ -22,6 +22,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const currentQ = (searchParams.get('q') || '').toLowerCase();
+  const isNotesActive = location.pathname === '/search' && currentQ === 'notes';
+  const isPyqsActive = location.pathname === '/search' && currentQ === 'pyqs';
 
   const handleUploadClick = () => {
     onCloseMobile();
@@ -113,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <NavLink
             to="/search?q=Notes"
-            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            className={() => `sidebar-link ${isNotesActive ? 'active' : ''}`}
             onClick={onCloseMobile}
           >
             <i className="fas fa-file-alt"></i>
@@ -122,20 +128,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <NavLink
             to="/search?q=PYQs"
-            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            className={() => `sidebar-link ${isPyqsActive ? 'active' : ''}`}
             onClick={onCloseMobile}
           >
             <i className="fas fa-file-circle-question"></i>
             <span>PYQs</span>
-          </NavLink>
-
-          <NavLink
-            to="/search?q=Syllabus"
-            className={({ isActive }) => `sidebar-link expanded-only ${isActive ? 'active' : ''}`}
-            onClick={onCloseMobile}
-          >
-            <i className="fas fa-book-open"></i>
-            <span>Syllabus</span>
           </NavLink>
 
           <NavLink
